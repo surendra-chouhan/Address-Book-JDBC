@@ -61,11 +61,15 @@ public class AddressBook {
        return addressBookList;
     }
 
-    public static void listdrivers(){
-        Enumeration<Driver> driverlist = DriverManager.getDrivers();
-        while(driverlist.hasMoreElements()){
-            Driver driverClass = (Driver) driverlist.nextElement();
-            System.out.println(" " + driverClass.getClass().getName());
+    public void updateData(){
+        String query = "Update addressbooktable set email='rohit@hotmail.com' where id = 4";
+        try{
+            Connection connection = this.getConnection();
+            Statement statement = connection.createStatement();
+            long resultset = statement.executeLargeUpdate(query);
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
         }
     }
 }

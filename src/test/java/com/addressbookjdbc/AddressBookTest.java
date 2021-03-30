@@ -46,4 +46,16 @@ public class AddressBookTest {
         List<AddressBookData> addressBookDataList = addressBook.return_Values_between_Particular_DateRange("2019-01-01");
         Assert.assertEquals(3, addressBookDataList.size());
     }
+
+    @Test
+    public void count_Contacts_in_a_City() throws SQLException {
+        String result = addressBook.countByCity("Mumbai");
+        Assert.assertEquals("3", result);
+    }
+
+    @Test
+    public void count_Contacts_in_a_State() throws SQLException {
+        String result = addressBook.countByState("Maharashtra");
+        Assert.assertEquals("4", result);
+    }
 }

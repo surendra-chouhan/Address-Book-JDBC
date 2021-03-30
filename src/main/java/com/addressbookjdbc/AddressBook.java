@@ -20,56 +20,69 @@ public class AddressBook {
         return con;
     }
 
-    public List<AddressBookData> readData() {
+    public List<AddressBookData> readData() throws SQLException {
        String sql_query = "Select * from addressbooktable;";
        List<AddressBookData> addressBookList = new ArrayList<>();
-       try{
-           Connection connection = this.getConnection();
-           Statement statement = connection.createStatement();
-           ResultSet resultSet = statement.executeQuery(sql_query);
-           while (resultSet.next()){
-               int id = resultSet.getInt(1);
-               String firstname = resultSet.getString(2);
-               String lastname = resultSet.getString(3);
-               String address = resultSet.getString(4);
-               String city = resultSet.getString(5);
-               String state = resultSet.getString(6);
-               int zip = resultSet.getInt(7);
-               String phonenumber = resultSet.getString(8);
-               String email = resultSet.getString(9);
-               System.out.println("\n");
-               System.out.println("Id : " + id);
-               System.out.println("First Name : " + firstname);
-               System.out.println("Last Name : " + lastname);
-               System.out.println("Address : " + address );
-               System.out.println("City : " + city);
-               System.out.println("State : " + state);
-               System.out.println("Zip : " + zip);
-               System.out.println("Phone Number : " + phonenumber);
-               System.out.println("Email : " + email);
+       Connection connection = this.getConnection();
 
+       try{
+           connection.setAutoCommit(false);
+           PreparedStatement preparedStatement = connection.prepareStatement(sql_query);
+           ResultSet resultSet = preparedStatement.executeQuery();
+           while (resultSet.next()){
                AddressBookData addressBook = new AddressBookData(resultSet.getInt(1),resultSet.getString(2),
                                             resultSet.getString(3),resultSet.getString(4), resultSet.getString(5),
                                             resultSet.getString(6),resultSet.getInt(7),resultSet.getString(8),
                                             resultSet.getString(9));
                addressBookList.add(addressBook);
+               connection.commit();
            }
+           System.out.println(addressBookList.toString());
        }
        catch (SQLException throwables){
            throwables.printStackTrace();
+           connection.rollback();
        }
        return addressBookList;
     }
 
-    public void updateData(){
-        String query = "Update addressbooktable set email='rohit@hotmail.com' where id = 4";
+    public void updateData(String state, int id) throws SQLException {
+        String query = "Update addressbooktable set state = ? where id = ?;";
+        Connection connection = this.getConnection();
         try{
-            Connection connection = this.getConnection();
-            Statement statement = connection.createStatement();
-            long resultset = statement.executeLargeUpdate(query);
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, state);
+            preparedStatement.setInt(2,3);
+            preparedStatement.executeUpdate();
+            connection.commit();
         }
         catch (SQLException throwables){
             throwables.printStackTrace();
+            connection.rollback();
+        }
+    }
+
+    public void updateContactDetails (String lastName, String address, String city, String state,int zip, String phoneNumber, String email, String firstName) throws SQLException {
+        Connection connection = this.getConnection();
+        try{
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = connection.prepareStatement("Update addressbooktable set lastName = ?, address = ?, city = ?, state = ?, zip = ?, phoneNumber = ?, email = ? where firstName = ?;");
+            preparedStatement.setString(1, lastName);
+            preparedStatement.setString(2, address);
+            preparedStatement.setString(3, city);
+            preparedStatement.setString(4, state);
+            preparedStatement.setInt(5, zip);
+            preparedStatement.setString(6, phoneNumber);
+            preparedStatement.setString(7, email);
+            preparedStatement.setString(8, firstName);
+
+            preparedStatement.executeUpdate();
+            connection.commit();
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+            connection.rollback();
         }
     }
 }

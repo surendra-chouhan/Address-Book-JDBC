@@ -155,4 +155,27 @@ public class AddressBook {
         }
         return  result;
     }
+
+    public void insertNewContact(String firstName, String lastName, String address, String city, String state, int zip, String phoneNumber, String email, String entry_date) throws SQLException {
+        Connection connection = this.getConnection();
+        try{
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = connection.prepareStatement("insert into addressbooktable (firstName, lastName, address, city, state, zip, phoneNumber, email, entry_date) values(?,?,?,?,?,?,?,?,?);");
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setString(3, address);
+            preparedStatement.setString(4, city);
+            preparedStatement.setString(5, state);
+            preparedStatement.setInt(6, zip);
+            preparedStatement.setString(7, phoneNumber);
+            preparedStatement.setString(8, email);
+            preparedStatement.setDate(9, Date.valueOf(entry_date));
+            preparedStatement.executeUpdate();
+            connection.commit();
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+            connection.rollback();
+        }
+    }
 }

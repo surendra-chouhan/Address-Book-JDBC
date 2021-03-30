@@ -33,7 +33,7 @@ public class AddressBook {
                AddressBookData addressBook = new AddressBookData(resultSet.getInt(1),resultSet.getString(2),
                                             resultSet.getString(3),resultSet.getString(4), resultSet.getString(5),
                                             resultSet.getString(6),resultSet.getInt(7),resultSet.getString(8),
-                                            resultSet.getString(9));
+                                            resultSet.getString(9), resultSet.getString(10));
                addressBookList.add(addressBook);
                connection.commit();
            }
@@ -84,5 +84,31 @@ public class AddressBook {
             throwables.printStackTrace();
             connection.rollback();
         }
+    }
+
+    public List<AddressBookData> return_Values_between_Particular_DateRange(String date) throws SQLException{
+        List<AddressBookData> addressBookList = new ArrayList<>();
+        Connection connection = this.getConnection();
+
+        try{
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = connection.prepareStatement("Select * from addressbooktable where entry_date >= ?;");
+            preparedStatement.setDate(1,Date.valueOf(date));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                AddressBookData addressBook = new AddressBookData(resultSet.getInt(1),resultSet.getString(2),
+                        resultSet.getString(3),resultSet.getString(4), resultSet.getString(5),
+                        resultSet.getString(6),resultSet.getInt(7),resultSet.getString(8),
+                        resultSet.getString(9), resultSet.getString(10));
+                addressBookList.add(addressBook);
+                connection.commit();
+            }
+            System.out.println(addressBookList.toString());
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+            connection.rollback();
+        }
+        return addressBookList;
     }
 }

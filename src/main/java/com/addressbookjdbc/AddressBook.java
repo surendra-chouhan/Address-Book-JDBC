@@ -1,9 +1,8 @@
 package com.addressbookjdbc;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.sql.Date;
+import java.util.*;
 
 public class AddressBook {
     private List<AddressBook> addressBookList;
@@ -177,5 +176,34 @@ public class AddressBook {
             throwables.printStackTrace();
             connection.rollback();
         }
+    }
+
+    public void addEmployeetoPayrollWithThreads(List<AddressBookData> addressBookList) {
+        Map<Integer, Boolean> addressBook = new HashMap<>();
+        addressBookList.forEach(addressBookData -> {
+            Runnable task = () -> {
+                addressBook.put(addressBookList.hashCode(), false);
+                System.out.println("Employee being added : " + Thread.currentThread().getName());
+                try {
+                    this.insertNewContact(addressBookData.getFirstName(), addressBookData.getLastName(), addressBookData.getAddress(), addressBookData.getCity(),
+                            addressBookData.getState(), addressBookData.getZip(), addressBookData.getPhoneNumber(), addressBookData.getEmail(), String.valueOf(addressBookData.getDate()));
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                addressBook.put(addressBookList.hashCode(), true);
+                System.out.println("Employee added : " + Thread.currentThread().getName());
+            };
+            Thread thread =  new Thread(task, addressBookData.getFirstName());
+            thread.start();
+        });
+        while (addressBook.containsValue(false)) {
+            try{
+                Thread.sleep(10);
+            }
+            catch(InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        System.out.println("" + this.addressBookList);
     }
 }

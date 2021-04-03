@@ -5,6 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AddressBookTest {
@@ -17,14 +21,14 @@ public class AddressBookTest {
     @Test
     public void givenSelectStatement_shouldReturnList() throws SQLException {
         List<AddressBookData> addressBookDataList = addressBook.readData();
-        Assert.assertEquals(7, addressBookDataList.size());
+        Assert.assertEquals(10, addressBookDataList.size());
     }
 
     @Test
     public void givenUpdateStatementforAddressBookTable_shouldReturnTrue() throws SQLException {
         addressBook.updateData("Maharashtra",3);
         List<AddressBookData> addressBookDataList = addressBook.readData();
-        Assert.assertEquals(7, addressBookDataList.size());
+        Assert.assertEquals(10, addressBookDataList.size());
     }
 
     @Test
@@ -44,19 +48,19 @@ public class AddressBookTest {
     @Test
     public void return_Values_between_Particular_DateRange() throws SQLException {
         List<AddressBookData> addressBookDataList = addressBook.return_Values_between_Particular_DateRange("2019-01-01");
-        Assert.assertEquals(3, addressBookDataList.size());
+        Assert.assertEquals(6, addressBookDataList.size());
     }
 
     @Test
     public void count_Contacts_in_a_City() throws SQLException {
         String result = addressBook.countByCity("Mumbai");
-        Assert.assertEquals("3", result);
+        Assert.assertEquals("4", result);
     }
 
     @Test
     public void count_Contacts_in_a_State() throws SQLException {
         String result = addressBook.countByState("Maharashtra");
-        Assert.assertEquals("4", result);
+        Assert.assertEquals("5", result);
     }
 
     @Test
@@ -74,5 +78,18 @@ public class AddressBookTest {
         addressBook.insertNewContact(firstName, lastName, address, city, state, zip, phoneNumber, email, entry_date);
         List<AddressBookData> addressBookDataList = addressBook.readData();
         Assert.assertEquals(8, addressBookDataList.size());
+    }
+
+    @Test
+    public void insert_into_addressBook_using_Threads() throws SQLException {
+        List<AddressBookData> addressBookDataList = new ArrayList<>();
+        addressBookDataList.add(new AddressBookData(9, "Bruce","Wayne", "1007 Mountain Drive", "Gotham", "New Jersey", 53540, "7351857301", "batman@wayne.com", "2019-05-19"));
+        addressBookDataList.add(new AddressBookData(10, "Steve","Rogers", "569 Leaman Place", "Brooklyn", "New York", 11201, "6781367092", "steve@avenger.com", "2020-06-21"));
+        Instant start = Instant.now();
+        addressBook.addEmployeetoPayrollWithThreads(addressBookDataList);
+        Instant end = Instant.now();
+        System.out.println("Duration of non thread process is : " + Duration.between(start, end));
+        List<AddressBookData> bookData = addressBook.readData();
+        Assert.assertEquals(10, bookData.size());
     }
 }
